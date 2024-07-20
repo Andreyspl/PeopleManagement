@@ -17,7 +17,7 @@ use App\Http\Controllers\AddressController;
 
 // Rotas de autenticação padrão do Laravel Breeze
 Route::get('/', function () {
-    return view('welcome');
+    return view('app');
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {

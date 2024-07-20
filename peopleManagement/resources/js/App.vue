@@ -1,7 +1,11 @@
 <template>
     <v-app>
       <v-main>
-        <example-component></example-component>
+        <v-container>
+          <h1>People Management System</h1>
+          <create-person></create-person>
+          <search-person></search-person>
+        </v-container>
       </v-main>
     </v-app>
   </template>
