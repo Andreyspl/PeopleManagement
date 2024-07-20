@@ -23,7 +23,7 @@ return new class extends Migration
             $table->string('state');
             $table->string('city');
             $table->timestamps();
-
+            $table->softDeletes(); 
             $table->foreign('person_id')->references('id')->on('people')->onDelete('cascade');
         });
     }

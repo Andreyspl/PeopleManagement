@@ -7,15 +7,17 @@ use Illuminate\Http\Request;
 
 class PersonController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        $people = Person::all();
-        return response()->json($people);
-    }
+        $query = Person::query();
 
-    public function create()
-    {
-        //
+        if ($request->has('query')) {
+            $query->where('name', 'like', '%' . $request->query('query') . '%')
+                ->orWhere('cpf', 'like', '%' . $request->query('query') . '%');
+        }
+
+        $people = $query->get();
+        return response()->json($people);
     }
 
     public function store(Request $request)
@@ -36,12 +38,8 @@ class PersonController extends Controller
 
     public function show(Person $person)
     {
+        $person->load('addresses');
         return response()->json($person);
-    }
-
-    public function edit(Person $person)
-    {
-        //
     }
 
     public function update(Request $request, Person $person)
@@ -64,5 +62,11 @@ class PersonController extends Controller
     {
         $person->delete();
         return response()->json(null, 204);
+    }
+
+    public function getById($id)
+    {
+        $person = Person::findOrFail($id);
+        return response()->json($person);
     }
 }

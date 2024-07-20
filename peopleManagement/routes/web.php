@@ -26,6 +26,9 @@ Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
 
 // Rotas para gerenciamento de pessoas
 Route::resource('people', PersonController::class);
+Route::get('people/{id}', [PersonController::class, 'getById']);
 
 // Rotas para gerenciamento de endereços
 Route::resource('addresses', AddressController::class);
+
+Route::get('people/{person}/addresses', [AddressController::class, 'history']);

@@ -3,22 +3,10 @@
 namespace App\Http\Controllers;
 
 use App\Models\Address;
-use App\Models\Person;
 use Illuminate\Http\Request;
 
 class AddressController extends Controller
 {
-    public function index()
-    {
-        $addresses = Address::all();
-        return response()->json($addresses);
-    }
-
-    public function create()
-    {
-        //
-    }
-
     public function store(Request $request)
     {
         $validated = $request->validate([
@@ -35,16 +23,6 @@ class AddressController extends Controller
 
         $address = Address::create($validated);
         return response()->json($address, 201);
-    }
-
-    public function show(Address $address)
-    {
-        return response()->json($address);
-    }
-
-    public function edit(Address $address)
-    {
-        //
     }
 
     public function update(Request $request, Address $address)
@@ -64,6 +42,13 @@ class AddressController extends Controller
         $address->update($validated);
         return response()->json($address);
     }
+
+    public function history($personId)
+    {
+        $addresses = Address::withTrashed()->where('person_id', $personId)->get();
+        return response()->json($addresses);
+    }
+
 
     public function destroy(Address $address)
     {

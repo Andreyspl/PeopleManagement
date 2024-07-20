@@ -1,13 +1,13 @@
 import { createApp } from 'vue';
 import App from './App.vue';
 import vuetify from './plugins/vuetify';
-
-import CreatePerson from './Components/CreatePerson.vue';
-import SearchPerson from './Components/SearchPerson.vue';
+import '@mdi/font/css/materialdesignicons.css';
+import Swal from 'sweetalert2';
+import VueTheMask from 'vue-the-mask';
 
 const app = createApp(App);
 
-app.component('create-person', CreatePerson);
-app.component('search-person', SearchPerson);
+app.config.globalProperties.$swal = Swal;
 
+app.use(VueTheMask);
 app.use(vuetify).mount('#app');
