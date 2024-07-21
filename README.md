@@ -41,6 +41,10 @@ cp .env.example .env
 Suba os containers Docker utilizando o Laravel Sail.
 
 ```bash
+composer require laravel/sail --dev
+```
+
+```bash
 ./vendor/bin/sail up -d
 ```
 
