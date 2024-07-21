@@ -112,3 +112,5 @@ Crie uma branch para sua feature (`git checkout -b feature/fooBar`)
 Commit suas alterações (`git commit -am 'Add some fooBar'`)
 Dê um push na branch (`git push origin feature/fooBar`)
 Crie um novo Pull Request
+
+### O diagrama do banco de dados se encontra dentro de ./diagramaDb, na raíz do projeto
