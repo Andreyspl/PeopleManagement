@@ -12,11 +12,32 @@ class PersonController extends Controller
         $query = Person::query();
 
         if ($request->has('query')) {
-            $query->where('name', 'like', '%' . $request->query('query') . '%')
-                ->orWhere('cpf', 'like', '%' . $request->query('query') . '%');
+            $query->where(function($q) use ($request) {
+                $q->where('name', 'like', '%' . $request->query('query') . '%')
+                  ->orWhere('cpf', 'like', '%' . $request->query('query') . '%');
+            });
+        }
+
+        if ($request->has('state')) {
+            $query->whereHas('addresses', function ($q) use ($request) {
+                $q->where('state', $request->query('state'));
+            });
+        }
+
+        if ($request->has('city')) {
+            $query->whereHas('addresses', function ($q) use ($request) {
+                $q->where('city', $request->query('city'));
+            });
+        }
+
+        if ($request->has('neighborhood')) {
+            $query->whereHas('addresses', function ($q) use ($request) {
+                $q->where('neighborhood', 'like', '%' . $request->query('neighborhood') . '%');
+            });
         }
 
         $people = $query->get();
+
         return response()->json($people);
     }
 
@@ -25,14 +46,18 @@ class PersonController extends Controller
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'social_name' => 'nullable|string|max:255',
-            'cpf' => 'required|string|max:14|unique:people',
+            'cpf' => 'required|string|max:14', // Assumindo que a máscara é aplicada
             'father_name' => 'nullable|string|max:255',
             'mother_name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|string|email|max:255|unique:people',
+            'email' => 'nullable|email|max:255',
         ]);
 
+        // Remove pontos e traços do CPF
+        $validated['cpf'] = preg_replace('/[\.\-]/', '', $validated['cpf']);
+
         $person = Person::create($validated);
+
         return response()->json($person, 201);
     }
 
@@ -42,19 +67,24 @@ class PersonController extends Controller
         return response()->json($person);
     }
 
-    public function update(Request $request, Person $person)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'name' => 'required|string|max:255',
             'social_name' => 'nullable|string|max:255',
-            'cpf' => 'required|string|max:14|unique:people,cpf,' . $person->id,
+            'cpf' => 'required|string|max:14', // Assumindo que a máscara é aplicada
             'father_name' => 'nullable|string|max:255',
             'mother_name' => 'nullable|string|max:255',
             'phone' => 'nullable|string|max:20',
-            'email' => 'nullable|string|email|max:255|unique:people,email,' . $person->id,
+            'email' => 'nullable|email|max:255',
         ]);
 
+        // Remove pontos e traços do CPF
+        $validated['cpf'] = preg_replace('/[\.\-]/', '', $validated['cpf']);
+
+        $person = Person::findOrFail($id);
         $person->update($validated);
+
         return response()->json($person);
     }
 

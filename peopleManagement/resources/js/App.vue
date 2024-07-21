@@ -2,9 +2,13 @@
     <v-app>
       <v-main>
         <v-container>
-          <h1>Sistema de gerenciamento de pessoas</h1>
+          <h1>Sistema de gerenciamento de Pessoas</h1>
           <CreatePerson @person-added="handlePersonAdded"></CreatePerson>
           <SearchPerson @people-found="handlePeopleFound" @view-person="viewPerson"></SearchPerson>
+  
+          <div v-if="searchMessage">
+            <h2>{{ searchMessage }}</h2>
+          </div>
   
           <v-dialog v-model="isEditPersonModalVisible" max-width="600px">
             <v-card>
@@ -37,18 +41,17 @@
           <AddressModal
             v-if="isAddressModalVisible"
             :personId="selectedPerson ? selectedPerson.id : null"
-            :initialAddress="addressToEdit"
+            :initialAddress="addressToEdit || {}"
             @close="isAddressModalVisible = false"
             @address-added="handleAddressAdded"
-            @address-updated="handleAddressUpdated"
+            @address-updated="handleAddressAdded"
           ></AddressModal>
   
           <AddressHistoryModal
             v-if="isAddressHistoryVisible"
             :personId="selectedPerson ? selectedPerson.id : null"
             @close="isAddressHistoryVisible = false"
-            @edit-address="editAddress"
-            @address-deleted="handleAddressDeleted"
+            @edit-address="openEditAddressModal"
           ></AddressHistoryModal>
         </v-container>
       </v-main>
@@ -79,6 +82,7 @@
         isDetailPersonModalVisible: false,
         isAddressModalVisible: false,
         isAddressHistoryVisible: false,
+        searchMessage: '',
         addressToEdit: null,
       };
     },
@@ -88,6 +92,9 @@
       },
       handlePeopleFound(people) {
         this.people = people;
+      },
+      updateSearchMessage(message) {
+        this.searchMessage = message;
       },
       viewPerson(person) {
         this.selectedPerson = person;
@@ -101,35 +108,21 @@
           this.selectedPerson.addresses.push(address);
         }
       },
-      handleAddressUpdated(updatedAddress) {
-        if (this.selectedPerson && this.selectedPerson.addresses) {
-          const index = this.selectedPerson.addresses.findIndex(address => address.id === updatedAddress.id);
-          if (index !== -1) {
-            this.selectedPerson.addresses.splice(index, 1, updatedAddress);
-          }
-        }
-      },
-      handleAddressDeleted(addressId) {
-        if (this.selectedPerson && this.selectedPerson.addresses) {
-          this.selectedPerson.addresses = this.selectedPerson.addresses.filter(address => address.id !== addressId);
-        }
-      },
       openEditPersonModal() {
         this.isDetailPersonModalVisible = false;
         this.isEditPersonModalVisible = true;
       },
       openAddressModal() {
-        this.addressToEdit = {};
         this.isDetailPersonModalVisible = false;
+        this.isAddressModalVisible = true;
+      },
+      openEditAddressModal(address) {
+        this.addressToEdit = address;
         this.isAddressModalVisible = true;
       },
       openAddressHistory() {
         this.isDetailPersonModalVisible = false;
         this.isAddressHistoryVisible = true;
-      },
-      editAddress(address) {
-        this.addressToEdit = address;
-        this.isAddressModalVisible = true;
       },
       async submitEditPersonForm() {
         try {
@@ -140,8 +133,8 @@
           console.error(error);
           this.$swal.fire('Erro', 'Erro ao atualizar os dados da pessoa.', 'error');
         }
-      },
-    },
+      }
+    }
   };
   </script>
   

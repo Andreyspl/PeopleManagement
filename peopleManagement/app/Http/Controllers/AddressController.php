@@ -25,7 +25,7 @@ class AddressController extends Controller
         return response()->json($address, 201);
     }
 
-    public function update(Request $request, Address $address)
+    public function update(Request $request, $id)
     {
         $validated = $request->validate([
             'person_id' => 'required|exists:people,id',
@@ -39,8 +39,12 @@ class AddressController extends Controller
             'city' => 'required|string|max:255',
         ]);
 
-        $address->update($validated);
-        return response()->json($address);
+        $address = Address::findOrFail($id);
+        $address->delete();
+
+        $newAddress = Address::create($validated);
+
+        return response()->json($newAddress);
     }
 
     public function history($personId)

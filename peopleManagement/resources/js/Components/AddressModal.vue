@@ -2,11 +2,11 @@
     <v-dialog v-model="dialog" max-width="600px">
       <v-card>
         <v-card-title>
-          <span class="headline">Adicionar/Editar Endereço</span>
+          <span class="headline">{{ addressData.id ? 'Editar Endereço' : 'Adicionar Endereço' }}</span>
         </v-card-title>
         <v-card-text>
           <v-form @submit.prevent="submitForm">
-            <v-select v-model="addressType" :items="['Residencial', 'Comercial']" label="Tipo de Endereço" required></v-select>
+            <v-select v-model="addressData.type" :items="['Residencial', 'Comercial']" label="Tipo de Endereço" required></v-select>
             <v-text-field v-model="addressData.cep" label="CEP" @blur="fetchAddress" required></v-text-field>
             <v-text-field v-model="addressData.logradouro" :disabled="addressFromAPI" label="Logradouro" required></v-text-field>
             <v-text-field v-model="addressData.number" label="Número" required></v-text-field>
@@ -34,6 +34,7 @@
       initialAddress: {
         type: Object,
         default: () => ({
+          id: null,
           person_id: null,
           type: '',
           cep: '',
@@ -91,10 +92,13 @@
           if (this.addressData.id) {
             response = await axios.put(`/addresses/${this.addressData.id}`, this.addressData);
             this.$emit('address-updated', response.data);
+            this.closeModal();
+            this.$swal.fire('Endereço Atualizado', 'Endereço atualizado com sucesso!', 'success');
           } else {
             response = await axios.post(`/addresses`, this.addressData);
             this.$emit('address-added', response.data);
-            this.$swal.fire('Sucesso', 'Endereço adicionado com sucesso!', 'success')
+            this.closeModal();
+            this.$swal.fire('Endereço Adicionado', 'Endereço adicionado com sucesso!', 'success');
           }
           this.closeModal();
         } catch (error) {
